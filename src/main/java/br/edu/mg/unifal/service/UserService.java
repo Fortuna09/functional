@@ -1,8 +1,16 @@
 package br.edu.mg.unifal.service;
 
+import br.edu.mg.unifal.domain.Address;
 import br.edu.mg.unifal.domain.User;
 import br.edu.mg.unifal.enumerator.Gender;
 import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Date;
+import java.util.UUID;
+import java.util.function.*;
 
 @NoArgsConstructor
 public class UserService {
@@ -11,13 +19,23 @@ public class UserService {
      *  PREDICATE
      *  Represents a predicate (boolean-valued function) of one argument.
      *  Example: Verify if the user is male
+     * !!!!!Return Boolean and receive 1 argument
      */
 
     // Using traditional Java
     public boolean isMale(User user) {
         return Gender.MALE.equals(user.getGender());
     }
+    public Boolean isSameGender(User user, Gender gender){
+        return gender.equals(user.getGender());
+    }
+
+
     // Using Predicate (Java 8)
+    public Predicate<User> isMale8 = user -> Gender.MALE.equals(user.getGender());
+    public Predicate<User> isPreferNotToSay = user -> Gender.PREFER_NOT_SAY.equals(user.getGender());
+    public BiPredicate<User, Gender> isSameGender8 = (user, gender) -> gender.equals(user.getGender());
+
 
 
     /* ------------------------------------ ## ------------------------------------ */
@@ -27,11 +45,24 @@ public class UserService {
      *  Represents an operation that accepts a single input argument and returns no result.
      *  Unlike most other functional interfaces, Consumer is expected to operate via side effects.
      *  Example: Print the information of a user
+     * !!!!!Return element and don´t receive 1 argument
      */
 
     // Using traditional Java
+    public void printUser(User user){
+        System.out.println(user.toString());
+    }
+
 
     // Using Consumer (Java 8)
+    public Consumer<User> printUser8 = user -> System.out.println(user.toString());
+    public BiConsumer<Gender, Address> printGenderAndAddress8 = (gender, address) -> {
+        System.out.println(gender.toString());
+        System.out.println(address.toString());
+    };
+    public Consumer<User> printGender8 = user -> System.out.println(user.getGender().toString());
+    public Consumer<User> printAddress = user -> System.out.println(user.getAddress().toString());
+
 
 
     /* ------------------------------------ ## ------------------------------------ */
@@ -41,11 +72,19 @@ public class UserService {
      *  Represents a supplier of results.
      *  There is no requirement that a new or distinct result be returned each time the supplier is invoked.
      *  Example: Implement a method that provides a random uuid
+     * !!!!!Return nothing and receive 1 argument
      */
 
     // Using traditional Java
+    public UUID getUUID(){
+        return UUID.randomUUID();
+    }
 
     // Using Supplier (Java 8)
+    public Supplier<UUID> getUUID8 = () -> UUID.randomUUID();     //or (UUID::randomUUID;)
+    public Supplier<LocalDate> getDate8 = LocalDate::now;
+
+//BISUPPLIER X
 
 
     /* ------------------------------------ ## ------------------------------------ */
@@ -54,12 +93,24 @@ public class UserService {
      *  FUNCTION
      *  Represents a function that accepts one argument and produces a result.
      *  Example: Implement a method that calculates the age of the user
+     * !!!!!Return something and receive 1 argument
      */
 
     // Using traditional Java
+    public int calculateAge(User user){
+        return Period.between(user.getBirthdate().toLocalDate(), LocalDate.now()).getYears();
+    }
 
     // Using Function (Java 8)
-
+    public Function<User, Integer> calculateAge8 = user ->
+            Period.between(user.getBirthdate().toLocalDate(), LocalDate.now()).getYears();
+    public BiFunction<LocalDate, LocalDate, Integer> calculateYearsBetweenDates8 = (firstDate, secondDate) ->
+    {
+        if (firstDate.isBefore(secondDate)) {
+            return Period.between(firstDate, secondDate).getYears();
+        }
+        return Period.between(secondDate, firstDate).getYears();
+    };
 
 
     /* ------------------------------------ ## ------------------------------------ */
